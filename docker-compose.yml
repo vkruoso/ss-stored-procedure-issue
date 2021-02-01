@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  memsql:
+    image: 'memsql/cluster-in-a-box:centos-7.3.2-a364d4b31f-3.2.0-1.9.6'
+    ports:
+      - 3306:3306
+      - 8080:8080
+    environment:
+      LICENSE_KEY: ${LICENSE_KEY}
+      ROOT_PASSWORD: ${MEMSQL_PASS}
+      START_AFTER_INIT: 'Y'
+
+  client:
+    command: "sh -c 'yarn install && yarn run dev'"
+    container_name: client
+    build:
+      context: ./client
+    environment:
+      MEMSQL_HOST: ${MEMSQL_HOST}
+      MEMSQL_PORT: ${MEMSQL_PORT}
+      MEMSQL_USER: ${MEMSQL_USER}
+      MEMSQL_PASS: ${MEMSQL_PASS}
+      MEMSQL_DATABASE: ${MEMSQL_DATABASE}
+    volumes:
+      - ./client:/app
+      - client-node-modules:/app/node_modules
+
+volumes:
+  client-node-modules:
